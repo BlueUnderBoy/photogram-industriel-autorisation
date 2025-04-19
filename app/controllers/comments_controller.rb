@@ -1,6 +1,7 @@
 class CommentsController < ApplicationController
   before_action :set_comment, only: %i[ show edit update destroy ]
-  before_action :is_an_authorized_user, only: [:destroy, :create]
+  before_action :user_verification, only: [ :create ]
+  before_action :author_verification, only: [:edit, :update, :destroy]
 
   # GET /comments or /comments.json
   def index
@@ -51,6 +52,7 @@ class CommentsController < ApplicationController
 
   # DELETE /comments/1 or /comments/1.json
   def destroy
+    puts "in destroy"
     @comment.destroy
     respond_to do |format|
       format.html { redirect_back fallback_location: root_url, notice: "Comment was successfully destroyed." }
@@ -69,10 +71,16 @@ class CommentsController < ApplicationController
       params.require(:comment).permit(:author_id, :photo_id, :body)
     end
 
-    def is_an_authorized_user
+    def user_verification
       @photo = Photo.find(params.fetch(:comment).fetch(:photo_id))
       if current_user != @photo.owner && @photo.owner.private? && !current_user.leaders.include?(@photo.owner)
         redirect_back fallback_location: root_url, alert: "Not authorized"
+      end
+    end
+
+    def author_verification
+      if @comment.author != current_user
+        redirect_back fallback_location: root_url, alert: "You're not authorized for that. From Comments Controller."
       end
     end
 end

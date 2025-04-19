@@ -1,4 +1,14 @@
 class ApplicationController < ActionController::Base
+  include Pundit::Authorization
+  
+  # after_action :verify_authorized, except: :index
+  # after_action :verify_policy_scoped, only: :index
+
+  # If the project is set up with Devise accounts
+  # after_action :verify_authorized, unless: :devise_controller?
+  # after_action :verify_policy_scoped, only: :index, unless: :devise_controller?
+
+
     # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
     allow_browser versions: :modern
 
@@ -17,10 +27,12 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit(:account_update, keys: [ :username, :private, :name, :bio, :website, :avatar_image ])
   end
 
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+
   private
 
   def user_not_authorized
-    flash[:alert] = "You are not authorized to perform this action."
+    flash[:alert] = "You're not authorized for that. From Application Controller."
 
     redirect_back(fallback_location: root_url)
   end

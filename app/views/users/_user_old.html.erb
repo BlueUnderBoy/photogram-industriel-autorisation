@@ -1,3 +1,4 @@
+
 <div class="d-flex">
   <div class="flex-shrink-0 w-25">
     <%= image_tag user.avatar_image_url, class: "me-3 rounded-circle img-cover img-medium" %>
@@ -9,12 +10,11 @@
         <%= user.username %>
       </h1>
 
-      <div>
+
         <span class="badge text-bg-secondary">
           <%= user.private? ? "Private" : "Public" %>
         </span>
       </div>
-    </div>
 
     <div class="mb-4 d-flex justify-content-between">
       <div>
@@ -53,27 +53,26 @@
         <% end %>
       </div>
 
-      <% if @user == current_user %>
-      <div>
-        <%=
-          link_to "#",
-            class: "link-underline link-underline-opacity-0 link-underline-opacity-100-hover",
-            data: { 
-              "bs-toggle": "modal", 
-              "bs-target": "##{dom_id(user)}_pending"
-            } do %>
+      <% if @current_user == @user %>
+        <div>
+          <%=
+            link_to "#",
+              class: "link-underline link-underline-opacity-0 link-underline-opacity-100-hover",
+              data: { 
+                "bs-toggle": "modal", 
+                "bs-target": "##{dom_id(user)}_pending"
+              } do %>
 
-          <span class="font-weight-bold">
-            <%= user.pending.size %>
-          </span>
-          
-          pending
+            <span class="font-weight-bold">
+              <%= user.pending.size %>
+            </span>
+            
+            pending
 
-        <% end %>
+          <% end %>
+        </div>
       </div>
-      <% end %>
-
-    </div>
+    <% end %>
 
     <div class="row mb-3">
       <div class="col">
@@ -134,28 +133,27 @@
   </div>
 </div>
 
-<%=
-  render "users/connected_users_modal",
-    user: user,
-    connected_users: user.followers,
-    description: "followers",
-    target: "#{dom_id(user)}_followers"
-%>
 
-<%=
-  render "users/connected_users_modal",
-    user: user,
-    connected_users: user.leaders,
-    description: "following",
-    target: "#{dom_id(user)}_following"
-%>
+    <%=
+      render "users/connected_users_modal",
+        user: user,
+        connected_users: user.followers,
+        description: "followers",
+        target: "#{dom_id(user)}_followers"
+    %>
 
-<% if @user == current_user %>
-<%=
-  render "users/connected_users_modal",
-    user: user,
-    connected_users: user.pending,
-    description: "pending",
-    target: "#{dom_id(user)}_pending"
-%>
-<% end %>
+    <%=
+      render "users/connected_users_modal",
+        user: user,
+        connected_users: user.leaders,
+        description: "following",
+        target: "#{dom_id(user)}_following"
+    %>
+
+    <%=
+      render "users/connected_users_modal",
+        user: user,
+        connected_users: user.pending,
+        description: "pending",
+        target: "#{dom_id(user)}_pending"
+    %>
